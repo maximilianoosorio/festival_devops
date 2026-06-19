@@ -1,0 +1,42 @@
+name: CI Festival DevOps Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-project:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+
+    - name: Validar estructura del Frontend
+      run: |
+        echo "Validando archivos estáticos del frontend..."
+        if [ ! -f "frontend/index.html" ]; then
+          echo "ERROR: frontend/index.html no existe." && exit 1
+        fi
+        if [ ! -f "frontend/style.css" ]; then
+          echo "ERROR: frontend/style.css no existe." && exit 1
+        fi
+        echo "¡Estructura básica del frontend validada con éxito!"
+
+    - name: Verificar archivos de Docker y Compose
+      run: |
+        echo "Verificando presencia de Dockerfiles y Compose..."
+        if [ ! -f "backend/Dockerfile" ]; then
+          echo "ERROR: Falta Dockerfile en backend." && exit 1
+        fi
+        if [ ! -f "frontend/Dockerfile" ]; then
+          echo "ERROR: Falta Dockerfile en frontend." && exit 1
+        fi
+        if [ ! -f "docker-compose.yml" ]; then
+          echo "ERROR: Falta docker-compose.yml en la raíz." && exit 1
+        fi
+        
+    - name: Validar sintaxis de Docker Compose
+      run: docker compose config
